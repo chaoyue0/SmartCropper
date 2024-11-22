@@ -31,3 +31,6 @@ export function querySelector(element: HTMLElement, selector: string): Element |
     return element.querySelector(selector)
 }
 
+export function blobToUrl(blob: Blob): string {
+    return URL.createObjectURL(blob)
+}

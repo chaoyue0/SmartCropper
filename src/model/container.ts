@@ -2,7 +2,7 @@ import { addClass } from "../controller/utilities.ts";
 import { CONTROLLER } from "../controller/constants.ts";
 
 /**
- * File: Container.ts
+ * File: container.ts
  * Description: Create a Container
  * Author: buxuewushu
  * Date: 2024-11-18

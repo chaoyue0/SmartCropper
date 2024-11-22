@@ -7,7 +7,7 @@
 import { initCropper } from '../controller/init.ts'
 
 const init = () => {
-  initCropper(600, 400)
+  initCropper('src/assets/picture.jpg', 600, 400)
 }
 </script>
 
