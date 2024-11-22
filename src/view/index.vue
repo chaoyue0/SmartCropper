@@ -1,7 +1,6 @@
 <template>
-  <div ref="cropper">
-   <button @click="init">初始化</button>
-  </div>
+  <div class="smart-cropper"></div>
+  <button @click="init">初始化</button>
 </template>
 
 <script setup lang="ts">
