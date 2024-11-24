@@ -1,4 +1,5 @@
-import {blobToUrl} from "../controller/utilities.ts";
+import { addClass, blobToUrl } from "../controller/utilities.ts";
+import { PICTURE } from "../controller/constants.ts";
 
 /**
  * File: picture.ts
@@ -28,6 +29,7 @@ class Picture {
             picture.style.width = this.width + 'px'
             picture.style.height = this.height + 'px'
             const img: HTMLImageElement = document.createElement('img')
+            addClass(img, PICTURE)
             img.setAttribute('alt', 'picture')
             if (image instanceof Blob) {
                 img.setAttribute('src', blobToUrl(image))
