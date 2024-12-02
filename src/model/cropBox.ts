@@ -1,57 +1,58 @@
-import { addClass } from "../controller/utilities.ts";
-import { CROPBOX } from "../controller/constants.ts";
-
 /**
  * File: cropBox.ts
  * Description: Create a new Cropper
  * Author: buxuewushu
- * Date: 2024-11-24
+ * Date: 2024-12-2
  *
  */
 class CropBox {
     /**
      * Create a new Cropper.
-     * @param {number} [width] - The Cropper width.
-     * @param {number} [height] - The Cropper height.
+     * @param {number[]} [startPosition] - Record the position of the mouse click.
+     * @param {Object} [screenshotData] - Save relevant information about the cropBox.
      */
-    width: number
-    height: number
-    show: boolean
+    startPosition : number[]
+    screenshotData : any
 
-    constructor(width: number, height: number) {
-        // this.options = Object.assign({}, options)
-        this.width = width * 0.8
-        this.height = height * 0.8
-        this.show = true
+    constructor() {
+        this.startPosition = []
+        this.screenshotData = []
     }
 
     init() {
-        const crop: HTMLElement | null = document.querySelector('.cropper-crop-box')
-        if (crop) {
-            crop.style.width = this.width + 'px'
-            crop.style.height = this.height + 'px'
-            addClass(crop, CROPBOX)
-            const view: HTMLElement | null = document.querySelector('.cropper-view-box')
-            if (view) {
-                const img: HTMLImageElement = document.createElement('img')
-                img.setAttribute('src', 'src/assets/picture.jpg')
-                view.appendChild(img)
-            }
+        const canvas: HTMLElement | null = document.querySelector('#canvas-picture')
+        if (canvas) {
+            canvas.addEventListener('mousedown', this.startCrop, false)
         }
     }
 
-    remove() {
-        this.show = false
+    // Use arrow functions to maintain correct this context
+    startCrop = (event: MouseEvent) => {
+        this.startPosition = [event.clientX, event.clientY]
+        const canvas: HTMLElement | null = document.querySelector('#canvas-picture')
+        if (canvas) {
+            // Arrow function cannot remove events through removeEventListener
+            canvas.addEventListener('mousemove', this.moveCrop, false)
+            canvas.addEventListener('mouseup', this.removeCrop, false)
+            canvas.addEventListener('mouseout', this.removeCrop, false)
+        }
     }
 
-    setSize(width: number, height: number) {
-        this.width = width
-        this.height = height
+    moveCrop = (event: MouseEvent) => {
+        const { offsetX, offsetY } = event
+        const [startX, startY] = this.startPosition
+        const [cropWidth, cropHeight] = [offsetX - startX, offsetY - startY]
+        this.screenshotData = { cropWidth: cropWidth, cropHeight: cropHeight }
     }
 
-    move() {}
-
-    adjust() {}
+    removeCrop = () => {
+        const canvas: HTMLElement | null = document.querySelector('#canvas-picture')
+        if (canvas) {
+            canvas.removeEventListener('mousemove', this.moveCrop, false)
+            canvas.removeEventListener('mouseup',this.removeCrop, false)
+            canvas.removeEventListener('mouseout',this.removeCrop, false)
+        }
+    }
 }
 
 export default CropBox

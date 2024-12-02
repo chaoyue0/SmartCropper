@@ -24,9 +24,10 @@ class Picture {
 
     init() {
         const imageInput: HTMLElement | null = document.querySelector('#imageFile')
-        const picture: HTMLElement | null = document.querySelector('.cropper-picture')
-        if (picture && imageInput) {
-            // change the pointer of this,make sure this.image is not undefined
+        const canvas: HTMLCanvasElement | null = document.querySelector('#canvas-picture')
+        if (canvas) canvas.style.display = 'none'
+        if (imageInput) {
+            // Change the pointer of this,make sure "this.image" is not undefined
             imageInput.addEventListener('change', (event: Event) => this.handleFileChange(event), false)
         }
     }
@@ -53,20 +54,21 @@ class Picture {
     drawCanvas() {
         const picture: HTMLElement | null = document.querySelector('.cropper-picture')
         if (picture) {
-            const canvas: HTMLCanvasElement | null = document.createElement('canvas')
-            const ctx: CanvasRenderingContext2D | null = canvas?.getContext('2d')
-            if (ctx && this.image) {
-                this.generateCanvas(picture, canvas, this.image.width, this.image.height)
-                ctx.drawImage(this.image, 0, 0, this.width, this.height)
+            const canvas: HTMLCanvasElement | null = document.querySelector('#canvas-picture')
+            if (canvas) {
+                const ctx: CanvasRenderingContext2D | null = canvas.getContext('2d')
+                if (ctx && this.image) {
+                    this.generateCanvas(picture, canvas, this.image.width, this.image.height)
+                    ctx.drawImage(this.image, 0, 0, this.width, this.height)
+                }
             }
-            picture.append(canvas)
         }
     }
 
     generateCanvas(container: HTMLElement, canvas:HTMLCanvasElement, width: number, height: number) {
         container.style.width = this.width + 'px'
         container.style.height = this.height + 'px'
-        container.style.display = 'block'
+        canvas.style.display = 'block'
         canvas.width = width
         canvas.height = height
     }

@@ -1,9 +1,10 @@
 export const TEMPLATE = (
     '<div class="cropper-container">' +
-        '<div class="cropper-picture"></div>' +
-        '<div class="cropper-drag-box"></div>' +
-        '<div class="cropper-crop-box">' +
-            '<div class="cropper-view-box"></div>' +
+        '<div class="cropper-picture">' +
+            '<canvas id="canvas-picture"></canvas>' +
+        '</div>' +
+        '<div class="cropper-crop">' +
+            '<canvas id="canvas-crop"></canvas>' +
             '<div class="cropper-info"></div>' +
         '</div>' +
     '</div>' +
