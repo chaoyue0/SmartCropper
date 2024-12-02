@@ -6,5 +6,6 @@ export const TEMPLATE = (
             '<div class="cropper-view-box"></div>' +
             '<div class="cropper-info"></div>' +
         '</div>' +
-    '</div>'
+    '</div>' +
+    '<input type="file" id="imageFile" accept="image/*">'
 )

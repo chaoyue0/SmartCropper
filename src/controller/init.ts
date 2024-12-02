@@ -5,11 +5,16 @@ import CropBox from "../model/cropBox.ts";
 
 /**
  * init a cropper.
- * @param {string | Blob} [image] - The Image element.
  * @param {number} [width] - The Controller width.
  * @param {number} [height] - The Controller height.
  */
-export const initCropper = (image: string | Blob, width: number, height: number) => {
+// class Cropper {
+//
+//     constructor() {
+//     }
+// }
+
+export const initCropper = (width: number, height: number) => {
     const smartCropperNode = document.querySelector('.smart-cropper')
 
     if (smartCropperNode) {
@@ -17,7 +22,7 @@ export const initCropper = (image: string | Blob, width: number, height: number)
         const container = new Container(width, height)
         container.init()
         const picture = new Picture(width, height)
-        picture.init(image)
+        picture.init()
         const cropBox = new CropBox(width, height)
         cropBox.init()
     } else {
