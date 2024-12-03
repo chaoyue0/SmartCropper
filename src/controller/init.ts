@@ -8,12 +8,6 @@ import CropBox from "../model/cropBox.ts";
  * @param {number} [width] - The Controller width.
  * @param {number} [height] - The Controller height.
  */
-// class Cropper {
-//
-//     constructor() {
-//     }
-// }
-
 export const initCropper = (width: number, height: number) => {
     const smartCropperNode = document.querySelector('.smart-cropper')
 
@@ -23,7 +17,7 @@ export const initCropper = (width: number, height: number) => {
         container.init()
         const picture = new Picture(width, height)
         picture.init()
-        const cropBox = new CropBox(width, height)
+        const cropBox = new CropBox(picture.getImage())
         cropBox.init()
     } else {
         console.error('Unable to find smartCropperNode, please create a node with class name .smart-cropper')

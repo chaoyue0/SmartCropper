@@ -1,16 +1,15 @@
 /**
  * File: picture.ts
- * Description: Create a Picture
+ * Description: Create a new cropper that the portal for uploading local images.
  * Author: buxuewushu
  * Date: 2024-12-2
  *
  */
 class Picture {
     /**
-     * Create a new Picture.
-     * @param {number} [width] - The Picture width.
-     * @param {number} [height] - The Picture height.
-     * @param {HTMLImageElement} [image] - The Image object.
+     * @param { number } [width] - The Picture width.
+     * @param { number } [height] - The Picture height.
+     * @param { HTMLImageElement } [image] - The Image object.
      */
     width: number
     height: number
@@ -71,6 +70,10 @@ class Picture {
         canvas.style.display = 'block'
         canvas.width = width
         canvas.height = height
+    }
+
+    getImage() {
+        return this.image
     }
 }
 
