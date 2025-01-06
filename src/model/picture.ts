@@ -57,16 +57,14 @@ class Picture {
             if (canvas) {
                 const ctx: CanvasRenderingContext2D | null = canvas.getContext('2d')
                 if (ctx && this.image) {
-                    this.generateCanvas(picture, canvas, this.image.width, this.image.height)
+                    this.generateCanvas(canvas, this.image.width, this.image.height)
                     ctx.drawImage(this.image, 0, 0, this.width, this.height)
                 }
             }
         }
     }
 
-    generateCanvas(container: HTMLElement, canvas:HTMLCanvasElement, width: number, height: number) {
-        container.style.width = this.width + 'px'
-        container.style.height = this.height + 'px'
+    generateCanvas(canvas: HTMLCanvasElement, width: number, height: number) {
         canvas.style.display = 'block'
         canvas.width = width
         canvas.height = height
