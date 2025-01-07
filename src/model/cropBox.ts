@@ -1,4 +1,4 @@
-import { MASKER_OPACITY } from "../controller/constants.ts";
+import { CORNERRADIUS, MASKER_OPACITY } from "../controller/constants.ts";
 
 /**
  * File: cropBox.ts
@@ -19,12 +19,14 @@ class CropBox {
      * @param { number[] } [startPosition] - Record the position of the mouse click.
      * @param { CropInformation | undefined } [screenshotData] - Save relevant information about the cropBox.
      * @param { HTMLImageElement } [image] - Pictures that need to be cropped.
-     * @param { number[] } [pointPosition] - The coordinate point when the mouse is clicked.
+     * @param { number[] } [clickPosition] - The coordinate point when the mouse is clicked.
+     * @param { number[] } [pointPosition] - Four corners of the cropping frame.
      * @param { boolean } [isMoving] - Determine whether the cutting frame is moving.
      */
     startPosition : number[]
     screenshotData : CropInformation | undefined
     image: HTMLImageElement
+    clickPosition: number[]
     pointPosition: number[]
     isMoving: boolean
 
@@ -32,6 +34,7 @@ class CropBox {
         this.startPosition = []
         this.screenshotData = undefined
         this.image = image
+        this.clickPosition = []
         this.pointPosition = []
         this.isMoving = false
     }
@@ -46,7 +49,7 @@ class CropBox {
     // Use arrow functions to maintain correct this context
     startCrop = (event: MouseEvent) => {
         this.startPosition = [event.clientX, event.clientY]
-        const canvas: HTMLElement | null = document.querySelector('#canvas-picture')
+        const canvas: HTMLCanvasElement | null = document.querySelector('#canvas-picture')
         if (canvas && !this.screenshotData) {
             // Arrow function cannot remove events through removeEventListener
             canvas.addEventListener('mousemove', this.dragCrop, false)
@@ -76,9 +79,33 @@ class CropBox {
         }
     }
 
+    drawCorners = () => {
+        if (this.screenshotData) {
+            const corners = [
+                { x: this.screenshotData.startX, y: this.screenshotData.startY }, // left-top
+                { x: this.screenshotData.startX + this.screenshotData.cropWidth, y: this.screenshotData.startY }, // right-top
+                { x: this.screenshotData.startX, y: this.screenshotData.startY + this.screenshotData.cropHeight }, // left-bottom
+                { x: this.screenshotData.startX + this.screenshotData.cropWidth, y: this.screenshotData.startY + this.screenshotData.cropHeight } // right-bottom
+            ]
+            const canvas: HTMLCanvasElement | null = document.querySelector('#canvas-picture')
+            if (canvas) {
+                const ctx: CanvasRenderingContext2D | null = canvas.getContext('2d')
+                if (ctx) {
+                    ctx.globalCompositeOperation = 'source-over'
+                    corners.forEach((corner) => {
+                        ctx.fillStyle = 'blue'
+                        ctx.beginPath()
+                        ctx.arc(corner.x, corner.y, CORNERRADIUS, 0, Math.PI * 2)
+                        ctx.fill()
+                    })
+                }
+            }
+        }
+    }
+
     startMove = (event: MouseEvent) => {
         const { offsetX, offsetY } = event
-        this.pointPosition = [offsetX, offsetY]
+        this.clickPosition = [offsetX, offsetY]
         this.isMoving = true
     }
 
@@ -86,8 +113,8 @@ class CropBox {
         if (this.isMoving) {
             const { offsetX, offsetY } = event
             let dx, dy
-            dx = offsetX - this.pointPosition[0]
-            dy = offsetY - this.pointPosition[1]
+            dx = offsetX - this.clickPosition[0]
+            dy = offsetY - this.clickPosition[1]
             const canvas: HTMLCanvasElement | null = document.querySelector('#canvas-picture')
             if (canvas) {
                 const ctx: CanvasRenderingContext2D | null = canvas.getContext('2d')
@@ -104,21 +131,23 @@ class CropBox {
         const { offsetX, offsetY } = event
         const pointEndPosition = [ offsetX, offsetY ]
         let dx, dy
-        dx = pointEndPosition[0] - this.pointPosition[0]
-        dy = pointEndPosition[1] - this.pointPosition[1]
+        dx = pointEndPosition[0] - this.clickPosition[0]
+        dy = pointEndPosition[1] - this.clickPosition[1]
         this.isMoving = false
         if (this.screenshotData && dx && dy) {
             this.screenshotData.startX = this.screenshotData.startX + dx
             this.screenshotData.startY = this.screenshotData.startY + dy
         }
+        this.drawCorners()
     }
 
     removeCrop = () => {
         const canvas: HTMLElement | null = document.querySelector('#canvas-picture')
         if (canvas) {
             canvas.removeEventListener('mousemove', this.dragCrop, false)
-            canvas.removeEventListener('mouseup',this.removeCrop, false)
-            canvas.removeEventListener('mouseout',this.removeCrop, false)
+            canvas.removeEventListener('mouseup', this.removeCrop, false)
+            canvas.removeEventListener('mouseout', this.removeCrop, false)
+            this.drawCorners()
         }
     }
 
