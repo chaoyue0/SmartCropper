@@ -85,7 +85,11 @@ class CropBox {
                 { x: this.screenshotData.startX, y: this.screenshotData.startY }, // left-top
                 { x: this.screenshotData.startX + this.screenshotData.cropWidth, y: this.screenshotData.startY }, // right-top
                 { x: this.screenshotData.startX, y: this.screenshotData.startY + this.screenshotData.cropHeight }, // left-bottom
-                { x: this.screenshotData.startX + this.screenshotData.cropWidth, y: this.screenshotData.startY + this.screenshotData.cropHeight } // right-bottom
+                { x: this.screenshotData.startX + this.screenshotData.cropWidth, y: this.screenshotData.startY + this.screenshotData.cropHeight }, // right-bottom
+                { x: this.screenshotData.startX + this.screenshotData.cropWidth / 2, y: this.screenshotData.startY }, // top
+                { x: this.screenshotData.startX + this.screenshotData.cropWidth / 2, y: this.screenshotData.startY + this.screenshotData.cropHeight }, // bottom
+                { x: this.screenshotData.startX, y: this.screenshotData.startY + this.screenshotData.cropHeight / 2 }, // left
+                { x: this.screenshotData.startX + this.screenshotData.cropWidth, y: this.screenshotData.startY + this.screenshotData.cropHeight / 2 } // right
             ]
             const canvas: HTMLCanvasElement | null = document.querySelector('#canvas-picture')
             if (canvas) {
@@ -98,6 +102,93 @@ class CropBox {
                         ctx.arc(corner.x, corner.y, CORNERRADIUS, 0, Math.PI * 2)
                         ctx.fill()
                     })
+                }
+            }
+        }
+    }
+
+    getCropPoint = (event: MouseEvent) => {
+        const { offsetX, offsetY } = event
+        // this.clickPosition = [offsetX, offsetY]
+        if (this.screenshotData) {
+            const corners = [
+                { type: 'left-top', x: this.screenshotData.startX, y: this.screenshotData.startY }, // left-top
+                { type: 'right-top', x: this.screenshotData.startX + this.screenshotData.cropWidth, y: this.screenshotData.startY }, // right-top
+                { type: 'left-bottom', x: this.screenshotData.startX, y: this.screenshotData.startY + this.screenshotData.cropHeight }, // left-bottom
+                { type: 'right-bottom', x: this.screenshotData.startX + this.screenshotData.cropWidth, y: this.screenshotData.startY + this.screenshotData.cropHeight }, // right-bottom
+                { type: 'top', x: this.screenshotData.startX + this.screenshotData.cropWidth / 2, y: this.screenshotData.startY }, // top
+                { type: 'bottom', x: this.screenshotData.startX + this.screenshotData.cropWidth / 2, y: this.screenshotData.startY + this.screenshotData.cropHeight }, // bottom
+                { type: 'left', x: this.screenshotData.startX, y: this.screenshotData.startY + this.screenshotData.cropHeight / 2 }, // left
+                { type: 'right', x: this.screenshotData.startX + this.screenshotData.cropWidth, y: this.screenshotData.startY + this.screenshotData.cropHeight / 2 } // right
+            ]
+            for (let i = 0; i < corners.length; i++) {
+                const distance = Math.sqrt((offsetX - corners[i].x) ** 2 + (offsetY - corners[i].y) ** 2)
+                if (distance <= CORNERRADIUS) {
+                    return corners[i].type
+                    break
+                }
+            }
+        }
+        return null
+    }
+
+    startChange = () => {
+        const canvas: HTMLCanvasElement | null = document.querySelector('#canvas-picture')
+        if (canvas) {
+            canvas.addEventListener('mousemove', this.changeCrop, false)
+        }
+    }
+
+    changeCrop = (event: MouseEvent) => {
+        const { offsetX, offsetY } = event
+        let dx, dy
+        if (this.screenshotData) {
+            dx = offsetX - this.screenshotData.startX
+            dy = offsetY - this.screenshotData.startY
+        }
+        console.log('dx', dx, 'dy', dy)
+        const point = this.getCropPoint(event)
+
+        const canvas: HTMLCanvasElement | null = document.querySelector('#canvas-picture')
+        if (canvas) {
+            const ctx: CanvasRenderingContext2D | null = canvas.getContext('2d')
+            if (ctx && this.screenshotData && dx && dy) {
+                switch (point) {
+                    case 'left-top':
+                        this.screenshotData.startX = offsetX
+                        this.screenshotData.startY = offsetY
+                        this.screenshotData.cropWidth -= dx
+                        this.screenshotData.cropHeight -= dy
+                        this.drawScreenShot(ctx, canvas.width, canvas.height,this.screenshotData.startX, this.screenshotData.startY, this.screenshotData.cropWidth, this.screenshotData.cropHeight)
+                        break
+                    case 'top-right':
+                        // cropBox.y += dy;
+                        // cropBox.width += dx;
+                        // cropBox.height -= dy;
+                        break;
+                    case 'bottom-left':
+                        // cropBox.x += dx;
+                        // cropBox.width -= dx;
+                        // cropBox.height += dy;
+                        break;
+                    case 'bottom-right':
+                        // cropBox.width += dx;
+                        // cropBox.height += dy;
+                        break;
+                    case 'top':
+                        // cropBox.y += dy;
+                        // cropBox.height -= dy;
+                        break;
+                    case 'bottom':
+                        // cropBox.height += dy;
+                        break;
+                    case 'left':
+                        // cropBox.x += dx;
+                        // cropBox.width -= dx;
+                        break;
+                    case 'right':
+                        // cropBox.width += dx;
+                        break;
                 }
             }
         }
@@ -139,6 +230,10 @@ class CropBox {
             this.screenshotData.startY = this.screenshotData.startY + dy
         }
         this.drawCorners()
+        const canvas: HTMLCanvasElement | null = document.querySelector('#canvas-picture')
+        if (canvas) {
+            canvas.addEventListener('mouseup', this.startChange, false)
+        }
     }
 
     removeCrop = () => {
@@ -157,6 +252,7 @@ class CropBox {
     }
 
     drawScreenShot = (ctx: CanvasRenderingContext2D, canvasWidth: number, canvasHeight: number, rectX: number, rectY: number, rectWidth: number, rectHeight: number) => {
+        console.log('draw')
         ctx.globalCompositeOperation = 'destination-out'
         ctx.fillStyle = '#2c2c2c'
         ctx.fillRect(rectX, rectY, rectWidth, rectHeight)
