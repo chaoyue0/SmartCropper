@@ -45,7 +45,7 @@ class CropBox {
     }
 
     init() {
-        const canvas: HTMLElement | null = document.querySelector('#canvas-picture')
+        const canvas: HTMLCanvasElement | null = document.querySelector('#canvas-picture')
         if (canvas) {
             if (!this.isCropped) {
                 this.isCropped = true
@@ -89,7 +89,7 @@ class CropBox {
     }
 
     endCrop = () => {
-        const canvas: HTMLElement | null = document.querySelector('#canvas-picture')
+        const canvas: HTMLCanvasElement | null = document.querySelector('#canvas-picture')
         if (canvas) {
             canvas.removeEventListener('mousemove', this.dragCrop, false)
             canvas.removeEventListener('mouseup', this.endCrop, false)
@@ -191,40 +191,40 @@ class CropBox {
                         point = this.getCropPoint(event)
                         this.reDrawScreenShot(ctx, canvas.width, canvas.height, this.screenshotData.startX, this.screenshotData.startY,
                             this.screenshotData.cropWidth, this.screenshotData.cropHeight)
-                        break;
+                        break
                     case 'right-bottom':
                         this.screenshotData.cropWidth = dx
                         this.screenshotData.cropHeight = dy
                         point = this.getCropPoint(event)
                         this.reDrawScreenShot(ctx, canvas.width, canvas.height, this.screenshotData.startX, this.screenshotData.startY,
                             this.screenshotData.cropWidth, this.screenshotData.cropHeight)
-                        break;
+                        break
                     case 'top':
                         this.screenshotData.startY = offsetY
                         this.screenshotData.cropHeight -= dy
                         point = this.getCropPoint(event)
                         this.reDrawScreenShot(ctx, canvas.width, canvas.height, this.screenshotData.startX, this.screenshotData.startY,
                             this.screenshotData.cropWidth, this.screenshotData.cropHeight)
-                        break;
+                        break
                     case 'bottom':
                         this.screenshotData.cropHeight = dy
                         point = this.getCropPoint(event)
                         this.reDrawScreenShot(ctx, canvas.width, canvas.height, this.screenshotData.startX, this.screenshotData.startY,
                             this.screenshotData.cropWidth, this.screenshotData.cropHeight)
-                        break;
+                        break
                     case 'left':
                         this.screenshotData.startX = offsetX
                         this.screenshotData.cropWidth -= dx
                         point = this.getCropPoint(event)
                         this.reDrawScreenShot(ctx, canvas.width, canvas.height, this.screenshotData.startX, this.screenshotData.startY,
                             this.screenshotData.cropWidth, this.screenshotData.cropHeight)
-                        break;
+                        break
                     case 'right':
                         this.screenshotData.cropWidth = dx
                         point = this.getCropPoint(event)
                         this.reDrawScreenShot(ctx, canvas.width, canvas.height, this.screenshotData.startX, this.screenshotData.startY,
                             this.screenshotData.cropWidth, this.screenshotData.cropHeight)
-                        break;
+                        break
                 }
             }
         }
