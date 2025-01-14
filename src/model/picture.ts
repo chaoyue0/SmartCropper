@@ -73,6 +73,15 @@ class Picture {
     getImage() {
         return this.image
     }
+
+    zoom(number: number) {
+        if (number === 0) {
+            return
+        }
+        this.width = this.width * number
+        this.height = this.height * number
+        this.drawCanvas()
+    }
 }
 
 export default Picture

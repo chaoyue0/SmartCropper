@@ -12,3 +12,16 @@ export const getCropImage = () => {
     }
     return canvas.toDataURL('image/jpeg') || ''
 }
+
+export const wheelZoom = () => {
+    const canvas: HTMLCanvasElement | null = document.querySelector('#canvas-crop')
+    if (canvas) {
+        canvas.addEventListener('wheel', function (e: WheelEvent) {
+            let scale = 1
+            const delta = e.deltaY > 0 ? -0.1 : 0.1
+            scale += delta
+            const { cropBox } = getInstances()
+            cropBox?.zoom(scale)
+        })
+    }
+}

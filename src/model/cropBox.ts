@@ -1,4 +1,5 @@
 import { CORNERRADIUS, MASKER_OPACITY } from "../controller/constants.ts";
+import {getInstances} from "../controller/init.ts";
 
 /**
  * File: cropBox.ts
@@ -45,12 +46,15 @@ class CropBox {
     }
 
     init() {
-        const canvas: HTMLCanvasElement | null = document.querySelector('#canvas-picture')
-        if (canvas) {
+        const canvas: HTMLCanvasElement | null = document.querySelector('#canvas-crop')
+        const { picture } = getInstances()
+        if (canvas && picture) {
             if (!this.isCropped) {
                 this.isCropped = true
                 document.body.style.cursor = 'crosshair'
                 canvas.addEventListener('mousedown', this.startCrop, false)
+                canvas.width = picture.width
+                canvas.height = picture.height
             }
         }
     }
@@ -58,7 +62,7 @@ class CropBox {
     // Use arrow functions to maintain correct this context
     startCrop = (event: MouseEvent) => {
         this.startPosition = [event.clientX, event.clientY]
-        const canvas: HTMLCanvasElement | null = document.querySelector('#canvas-picture')
+        const canvas: HTMLCanvasElement | null = document.querySelector('#canvas-crop')
         if (canvas && !this.screenshotData) {
             // Arrow function cannot remove events through removeEventListener
             canvas.addEventListener('mousemove', this.dragCrop, false)
@@ -74,11 +78,11 @@ class CropBox {
         this.screenshotData = { startX: startX, startY: startY, cropWidth: cropWidth, cropHeight: cropHeight }
 
         // Draw mask and cropped rectangular area
-        const canvas: HTMLCanvasElement | null = document.querySelector('#canvas-picture')
+        const canvas: HTMLCanvasElement | null = document.querySelector('#canvas-crop')
         if (canvas) {
             const ctx: CanvasRenderingContext2D | null = canvas.getContext('2d')
             if (ctx) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height)
+                // ctx.clearRect(0, 0, canvas.width, canvas.height)
                 this.drawImageMasker(ctx, 0, 0,canvas.width, canvas.height, MASKER_OPACITY)
                 this.drawScreenShot(ctx, canvas.width, canvas.height,this.startPosition[0], this.startPosition[1], cropWidth, cropHeight)
                 canvas.addEventListener('mousedown', this.startMove, false)
@@ -89,7 +93,7 @@ class CropBox {
     }
 
     endCrop = () => {
-        const canvas: HTMLCanvasElement | null = document.querySelector('#canvas-picture')
+        const canvas: HTMLCanvasElement | null = document.querySelector('#canvas-crop')
         if (canvas) {
             canvas.removeEventListener('mousemove', this.dragCrop, false)
             canvas.removeEventListener('mouseup', this.endCrop, false)
@@ -110,7 +114,7 @@ class CropBox {
                 { x: this.screenshotData.startX, y: this.screenshotData.startY + this.screenshotData.cropHeight / 2 }, // left
                 { x: this.screenshotData.startX + this.screenshotData.cropWidth, y: this.screenshotData.startY + this.screenshotData.cropHeight / 2 } // right
             ]
-            const canvas: HTMLCanvasElement | null = document.querySelector('#canvas-picture')
+            const canvas: HTMLCanvasElement | null = document.querySelector('#canvas-crop')
             if (canvas) {
                 const ctx: CanvasRenderingContext2D | null = canvas.getContext('2d')
                 if (ctx) {
@@ -158,7 +162,7 @@ class CropBox {
         }
         let point = this.getCropPoint(event)
 
-        const canvas: HTMLCanvasElement | null = document.querySelector('#canvas-picture')
+        const canvas: HTMLCanvasElement | null = document.querySelector('#canvas-crop')
         if (canvas) {
             const ctx: CanvasRenderingContext2D | null = canvas.getContext('2d')
             if (ctx && this.screenshotData && dx && dy) {
@@ -257,7 +261,7 @@ class CropBox {
             let dx, dy
             dx = offsetX - this.clickPosition[0]
             dy = offsetY - this.clickPosition[1]
-            const canvas: HTMLCanvasElement | null = document.querySelector('#canvas-picture')
+            const canvas: HTMLCanvasElement | null = document.querySelector('#canvas-crop')
             if (canvas) {
                 const ctx: CanvasRenderingContext2D | null = canvas.getContext('2d')
                 if (ctx && this.screenshotData) {
@@ -331,6 +335,28 @@ class CropBox {
             //     this.screenshotData.startY = this.screenshotData.startY + dy
             // }
             this.drawCorners()
+        }
+    }
+
+    zoom = (number: number) => {
+        if (number === 0) {
+            return
+        }
+        const canvas: HTMLCanvasElement | null = document.querySelector('#canvas-crop')
+        if (canvas) {
+            const ctx: CanvasRenderingContext2D | null = canvas.getContext('2d')
+            if (ctx && this.screenshotData) {
+                canvas.width = canvas.width * number
+                canvas.height = canvas.height * number
+                const { picture } = getInstances()
+                if (picture) {
+                    canvas.width = canvas.width < picture.width ? picture.width : canvas.width
+                    canvas.height = canvas.height < picture.height ? picture.height : canvas.height
+                }
+                this.reDrawScreenShot(ctx, canvas.width, canvas.height, this.screenshotData.startX, this.screenshotData.startY,
+                    this.screenshotData.cropWidth, this.screenshotData.cropHeight)
+                this.drawCorners()
+            }
         }
     }
 

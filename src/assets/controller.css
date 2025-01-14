@@ -1,4 +1,14 @@
-.controller {
+.cropper-container {
   position: relative;
   overflow: hidden;
+}
+
+.cropper-picture {
+  position: absolute;
+  top: 0;
+}
+
+.cropper-crop {
+  position: absolute;
+  top: 0;
 }
